@@ -11,4 +11,6 @@ router.get(
 );
 
 router.get("/get-team-list",sportController.getTeamListUnderSport)
+
+router.get("/live-score",sportController.getLiveScore)
 export const sportsRoute = router;

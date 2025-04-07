@@ -14,7 +14,7 @@ const getSportsList=catchAsync(async(req,res)=>{
 })
 const getTeamListUnderSport=catchAsync(async(req,res)=>{
 
-    const result=await sportService.getTeamListUnderSport()
+    const result=await sportService.getTeamListUnderSport(req.query.uuid as string)
     sendResponse(res, {
         success: true,
         statusCode: 201,
@@ -22,8 +22,22 @@ const getTeamListUnderSport=catchAsync(async(req,res)=>{
         data: result,
       });
 })
+const getLiveScore=catchAsync(async(req,res)=>{
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
 
+    const userId=req.query.uuid
+    const result=await sportService.getLiveScore(userId as string)
+    sendResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: "getTeamListUnderSport  get successfully",
+        data: result,
+      });
+})
 export const sportController={
     getSportsList,
-    getTeamListUnderSport
+    getTeamListUnderSport,
+    getLiveScore
 }
