@@ -22,20 +22,34 @@ const getTeamListUnderSport=catchAsync(async(req,res)=>{
         data: result,
       });
 })
-const getLiveScore=catchAsync(async(req,res)=>{
+const getLiveScore = catchAsync(async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+  
+    const userId = req.query.uuid as string;
+  
+    const sendLiveScore = async () => {
+      const result = await sportService.getLiveScore(userId);
+    //  console.log("check result from controller",result)
+   
+      res.write(`data: ${JSON.stringify(result)}\n\n`);
+    };
+  
 
-    const userId=req.query.uuid
-    const result=await sportService.getLiveScore(userId as string)
-    sendResponse(res, {
-        success: true,
-        statusCode: 201,
-        message: "getTeamListUnderSport  get successfully",
-        data: result,
-      });
-})
+    await sendLiveScore();
+
+    const interval = setInterval(async () => {
+      await sendLiveScore();
+    }, 30 * 1000);
+
+    req.on("close", () => {
+      console.log("SSE connection closed");
+      clearInterval(interval);
+      res.end();
+    });
+  });
+  
 export const sportController={
     getSportsList,
     getTeamListUnderSport,

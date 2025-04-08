@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Live Score SSE Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .match {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+    .team {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .team img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+    .score {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏀 Live NBA Scores (Updated Every Minute)</h1>
+  <div id="scores"></div>
+
+  <script>
+    const uuid = "1XA2TLmPdxQeUcMWLlUKWkELHDh2";
+    const eventSource = new EventSource(`http://localhost:5001/api/v1/sports/live-score?uuid=${uuid}`);
+
+    eventSource.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      console.log(data,"check data")
+      const container = document.getElementById("scores");
+      container.innerHTML = "";
+      
+
+      if (!data || data.length === 0) {
+        container.innerHTML = "<p>No live scores for your teams right now.</p>";
+        return;
+      }
+
+      data.forEach((match, index) => {
+        const matchHtml = `
+          <div class="match">
+            <div class="team">
+              <img src="${match.strHomeTeamBadge}" alt="${match.strHomeTeam} logo">
+              <span>${match.strHomeTeam}</span>
+              <span class="score"> — ${match.intHomeScore ?? 'N/A'}</span>
+            </div>
+            <div class="team">
+              <img src="${match.strAwayTeamBadge}" alt="${match.strAwayTeam} logo">
+              <span>${match.strAwayTeam}</span>
+              <span class="score"> — ${match.intAwayScore ?? 'N/A'}</span>
+            </div>
+            <p><strong>Status:</strong> ${match.strStatus || 'Unknown'} | <strong>Time:</strong> ${match.strEventTime}</p>
+          </div>
+        `;
+        container.innerHTML += matchHtml;
+      });
+    };
+
+    eventSource.onerror = function (error) {
+      console.error("SSE connection error:", error);
+      eventSource.close();
+    };
+  </script>
+</body>
+</html>
