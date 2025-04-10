@@ -97,8 +97,57 @@ return result;
   //   return result;
   // };
   
+  const getLiveScore = async (uuid: string) => {
+    const userData: any = await getUserDataByUuid(uuid);
+    const selectedTeamIds = userData?.selectedTeam?.map((team: any) => team.id) || [];
+    console.log(selectedTeamIds, "check selected team ids");
   
-    const getLiveScore = async (uuid: string) => {
+    const response = await fetch("https://www.thesportsdb.com/api/v2/json/livescore/all", {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "472735",
+      },
+    });
+  
+    const data = await response.json();
+    const allMatches = data?.livescore || [];
+  
+    // Function to check if the match is live
+    const isLiveMatch = (match: any) => {
+      const status = (match.strStatus || "").toLowerCase();
+      const progress = (match.strProgress || "").toLowerCase();
+      console.log(progress, "check progress");
+      console.log(status, "check status");
+  
+
+      return (
+        status === "live" ||
+        progress.includes("quarter") ||
+        progress.includes("half") ||
+        progress.includes("period") ||
+        progress.includes("in progress") ||
+        progress.startsWith("in") ||
+        status === "aot" || 
+        status === "ht" || 
+        status === "1h" || 
+        status === "2h" || 
+        // progress === "final" || 
+        status === null 
+      );
+    };
+  
+
+    const filteredMatches = allMatches.filter((match: any) =>
+      isLiveMatch(match) &&
+      (selectedTeamIds.includes(match.idHomeTeam) || selectedTeamIds.includes(match.idAwayTeam))
+    );
+    
+    console.log(filteredMatches, "check filteredmatches");
+    return filteredMatches;
+  };
+  
+
+    const getUpcomingMatch = async (uuid: string) => {
       const userData: any = await getUserDataByUuid(uuid);
       const selectedTeamIds = userData?.selectedTeam?.map((team: any) => team.id) || [];
     
@@ -108,35 +157,36 @@ return result;
           "x-api-key": "472735",
         },
       });
-
-   
-
-
     
       const data = await response.json();
       const allMatches = data?.livescore || [];
     
-
-      const isLiveMatch = (match: any) => {
-        const status = (match.strStatus || "").toLowerCase();
+      const isUpcomingMatch = (match: any) => {
         const progress = (match.strProgress || "").toLowerCase();
-    
-        return status === "live" ||
-          progress.includes("quarter") ||
-          progress.includes("half") ||
-          progress.includes("period") ||
-          progress.includes("in progress");
+        return progress === "ns";
       };
     
-    
       const filteredMatches = allMatches.filter((match: any) =>
-        isLiveMatch(match) &&
+        isUpcomingMatch(match) &&
         (selectedTeamIds.includes(match.idHomeTeam) || selectedTeamIds.includes(match.idAwayTeam))
       );
     
       return filteredMatches;
     };
-    
+    const getAllUserUuids=async()=>{
+      
+    const userRef=db.collection('user')
+    const doc=await userRef.get()
+
+    console.log(doc,"check doc")
+    const uuid: string[]=[]
+   
+    doc.forEach((user)=>{
+      uuid.push(user.id)
+    })
+
+    return uuid
+    }
 
 const getUserDataByUuid = async (uuid:string) => {
   const userRef = db.collection('user').doc(uuid); 
@@ -153,6 +203,9 @@ const getUserDataByUuid = async (uuid:string) => {
 export const sportService = {
   getSportsList,
   getTeamListUnderSport,
-  getLiveScore
+  getLiveScore,
+  getAllUserUuids,
+  getUpcomingMatch,
+  getUserDataByUuid
 };
 

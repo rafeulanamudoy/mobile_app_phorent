@@ -36,7 +36,7 @@
   <div id="scores"></div>
 
   <script>
-    const uuid = "1XA2TLmPdxQeUcMWLlUKWkELHDh2";
+    const uuid = "dwSYV7NEwISKMDHQccQJIgi3Uuq1";
     const eventSource = new EventSource(`http://localhost:5001/api/v1/sports/live-score?uuid=${uuid}`);
 
     eventSource.onmessage = function (event) {

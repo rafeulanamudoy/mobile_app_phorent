@@ -6,6 +6,7 @@ import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 import { PrismaClient } from "@prisma/client";
 import path from "path";
+import { scheduleLiveScoreFetcher } from "./shared/liveScoreCorn";
 
 const app: Application = express();
 const prisma = new PrismaClient();
@@ -34,7 +35,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // Router setup
 app.use("/api/v1", router);
-
+scheduleLiveScoreFetcher()
 // Global Error Handler
 app.use(GlobalErrorHandler);
 
