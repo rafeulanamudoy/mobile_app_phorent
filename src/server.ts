@@ -4,10 +4,12 @@ import config from "./config";
 import redis from "./shared/redis";
 
 async function main() {
+  await redis.ping();
   const server: Server = app.listen(config.port, () => {
     console.log("Sever is running on port ", config.port);
 
   });
+
 
   const exitHandler = () => {
     if (server) {

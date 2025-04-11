@@ -100,7 +100,7 @@ return result;
   const getLiveScore = async (uuid: string) => {
     const userData: any = await getUserDataByUuid(uuid);
     const selectedTeamIds = userData?.selectedTeam?.map((team: any) => team.id) || [];
-    console.log(selectedTeamIds, "check selected team ids");
+    // console.log(selectedTeamIds, "check selected team ids");
   
     const response = await fetch("https://www.thesportsdb.com/api/v2/json/livescore/all", {
       headers: {
@@ -116,8 +116,8 @@ return result;
     const isLiveMatch = (match: any) => {
       const status = (match.strStatus || "").toLowerCase();
       const progress = (match.strProgress || "").toLowerCase();
-      console.log(progress, "check progress");
-      console.log(status, "check status");
+      // console.log(progress, "check progress");
+      // console.log(status, "check status");
   
 
       return (
@@ -142,43 +142,63 @@ return result;
       (selectedTeamIds.includes(match.idHomeTeam) || selectedTeamIds.includes(match.idAwayTeam))
     );
     
-    console.log(filteredMatches, "check filteredmatches");
+    // console.log(filteredMatches, "check filteredmatches");
     return filteredMatches;
   };
   
 
-    const getUpcomingMatch = async (uuid: string) => {
+  const getUpcomingMatch = async (uuid: string) => {
+    try {
       const userData: any = await getUserDataByUuid(uuid);
       const selectedTeamIds = userData?.selectedTeam?.map((team: any) => team.id) || [];
-    
+  
       const response = await fetch("https://www.thesportsdb.com/api/v2/json/livescore/all", {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": "472735",
         },
       });
+  
+ 
+      if (!response.ok) {
+        console.warn(`⚠️ SportsDB API returned status ${response.status}`);
+        console.warn("in this  regiion it didnt support the sports db api")
+        return [];
+      }
+  
     
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        console.warn("⚠️ Unexpected content-type, likely blocked in region.");
+        return [];
+      }
+  
       const data = await response.json();
       const allMatches = data?.livescore || [];
-    
+  
       const isUpcomingMatch = (match: any) => {
         const progress = (match.strProgress || "").toLowerCase();
-        return progress === "ns";
+        return progress === "ns"; // NS = Not Started
       };
-    
+  
       const filteredMatches = allMatches.filter((match: any) =>
         isUpcomingMatch(match) &&
         (selectedTeamIds.includes(match.idHomeTeam) || selectedTeamIds.includes(match.idAwayTeam))
       );
-    
+  
       return filteredMatches;
-    };
+    } catch (error: any) {
+      console.error("❌ Error fetching upcoming matches:", error.message || error);
+      return []; // Safely return empty so app doesn't break
+    }
+  };
+  
     const getAllUserUuids=async()=>{
       
     const userRef=db.collection('user')
     const doc=await userRef.get()
 
-    console.log(doc,"check doc")
+    // console.log(doc,"check doc")
     const uuid: string[]=[]
    
     doc.forEach((user)=>{

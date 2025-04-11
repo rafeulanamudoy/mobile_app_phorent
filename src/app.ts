@@ -1,46 +1,69 @@
 import express, { Application, NextFunction, Request, Response } from "express";
-
 import httpStatus from "http-status";
 import cors from "cors";
+import path from "path";
+import { PrismaClient } from "@prisma/client";
+
 import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
-import { PrismaClient } from "@prisma/client";
-import path from "path";
 import { scheduleLiveScoreFetcher } from "./shared/liveScoreCorn";
+import { notificationQueue } from "./shared/notficationQuue";
+import "./shared/notfication.process";
+// ✅ Bull Board Setup
+import { ExpressAdapter } from "@bull-board/express";
+import { createBullBoard } from "@bull-board/api";
+import { BullAdapter } from "@bull-board/api/bullAdapter";
 
+// Setup Bull Board Adapter
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath("/admin/queues");
+
+createBullBoard({
+  queues: [new BullAdapter(notificationQueue)],
+  serverAdapter,
+});
+
+// Initialize Express App
 const app: Application = express();
 const prisma = new PrismaClient();
 
-// Middleware setup
+// ✅ Connect Prisma (MongoDB)
 prisma
   .$connect()
   .then(() => {
-    console.log("Database connected successfully!");
+    console.log("✅ Database connected successfully");
   })
   .catch((error) => {
-    console.error("Failed to connect to the database:", error);
+    console.error("❌ Failed to connect to the database:", error);
   });
 
+// ✅ Middleware Setup
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
-// Route handler for root endpoint
-app.get("/", (req: Request, res: Response) => {
+// ✅ Bull Board UI
+app.use("/admin/queues", serverAdapter.getRouter()); // Open at: http://localhost:<port>/admin/queues
+
+// ✅ Health Check Route
+app.get("/", (_req: Request, res: Response) => {
   res.send({
-    Message: "Welcome to api main route",
+    message: "🚀 Welcome to the API main route",
   });
 });
 
-// Router setup
+// ✅ API Routes
 app.use("/api/v1", router);
-scheduleLiveScoreFetcher()
-// Global Error Handler
+
+// ✅ Start Cron Job
+scheduleLiveScoreFetcher();
+
+// ✅ Global Error Handler
 app.use(GlobalErrorHandler);
 
-// API Not found handler
-app.use((req: Request, res: Response, next: NextFunction) => {
+// ✅ 404 Handler
+app.use((req: Request, res: Response, _next: NextFunction) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,
     message: "API NOT FOUND!",

@@ -7,41 +7,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  username     String
-  email        String         @unique
-  password     String
-  role         UserRole       @default(USER)
-  status       UserStatus     @default(ACTIVE)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
 
+model Notifications {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId String  
+  body       String
+  title      String
 
-  @@map("users")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("notifications")
 }
 
 
-
-model Otp {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  otpCode   String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("otps")
-}
-
-enum UserStatus {
-  ACTIVE
-  BLOCKED
-  DELETED
-}
-
-enum UserRole {
-  ADMIN
-  SUPER_ADMIN
-  USER
-}

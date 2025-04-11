@@ -1,5 +1,6 @@
 import Bull from "bull";
-import { sendPushNotification } from "./notification.service";
+import { notificationServices } from "../app/modules/notification/notification.service";
+
 
 
 // Create Bull queue
@@ -11,7 +12,3 @@ export const notificationQueue = new Bull("notification-queue", {
 });
 
 // Queue processor
-notificationQueue.process(async (job) => {
-  const { uuid, match } = job.data;
-  await sendPushNotification(uuid, match);
-});
