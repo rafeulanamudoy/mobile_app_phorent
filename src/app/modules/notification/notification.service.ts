@@ -19,6 +19,7 @@ const getNotificationsFromDB = async (receiverId: string) => {
 const sendPushNotification = async (uuid: string, match: any,title:string,body:any) => {
     const userRef = db.collection("user").doc(uuid);
     const userDoc = await userRef.get();
+    console.log(userDoc,"checj user doc")
   
     if (!userDoc.exists) {
       console.warn(`User with uuid ${uuid} not found`);

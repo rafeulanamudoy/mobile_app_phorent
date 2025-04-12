@@ -5,8 +5,8 @@ import sendResponse from "../../../shared/sendResponse";
 import { notificationServices } from "./notification.service";
 
 const getNotificationsFrom = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user.id as string;
-  const result = await notificationServices.getNotificationsFromDB(userId);
+
+  const result = await notificationServices.getNotificationsFromDB(req.query.uuid as string);
 
   sendResponse(res, {
     statusCode: 200,

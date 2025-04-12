@@ -36,8 +36,8 @@
   <div id="scores"></div>
 
   <script>
-    const uuid = "dwSYV7NEwISKMDHQccQJIgi3Uuq1";
-    const eventSource = new EventSource(`http://localhost:5001/api/v1/sports/live-score?uuid=${uuid}`);
+    const matchId = "139141";
+    const eventSource = new EventSource(`http://localhost:5001/api/v1/sports/live-score?matchId=${matchId}`);
 
     eventSource.onmessage = function (event) {
       const data = JSON.parse(event.data);

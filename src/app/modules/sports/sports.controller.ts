@@ -27,10 +27,10 @@ const getLiveScore = catchAsync(async (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
   
-    const userId = req.query.uuid as string;
+    const matchId = req.query.matchId as string;
   
     const sendLiveScore = async () => {
-      const result = await sportService.getLiveScore(userId);
+      const result = await sportService.getLiveScore(matchId);
     //  console.log("check result from controller",result)
    
       res.write(`data: ${JSON.stringify(result)}\n\n`);

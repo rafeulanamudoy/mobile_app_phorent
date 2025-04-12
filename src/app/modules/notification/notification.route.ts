@@ -5,6 +5,6 @@ import { notificationController } from "./notfication.controller";
 
 const router = Router();
 
-router.get("/", auth(), notificationController.getNotificationsFrom);
+router.get("/", notificationController.getNotificationsFrom);
 
 export const notificationRoute = router;
