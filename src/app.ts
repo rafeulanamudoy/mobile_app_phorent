@@ -13,6 +13,7 @@ import "./shared/notfication.process";
 import { ExpressAdapter } from "@bull-board/express";
 import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
+import { runCornJob } from "./shared/runCornJob";
 
 // Setup Bull Board Adapter
 const serverAdapter = new ExpressAdapter();
@@ -57,7 +58,8 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/v1", router);
 
 // ✅ Start Cron Job
-scheduleLiveScoreFetcher();
+// scheduleLiveScoreFetcher();
+runCornJob()
 
 // ✅ Global Error Handler
 app.use(GlobalErrorHandler);

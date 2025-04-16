@@ -91,7 +91,7 @@ const getTeamListUnderSport = async (uuid: string) => {
 // };
 
 const getLiveScore = async (matchId: string) => {
-  console.log(matchId, "check matchId");
+
   const response = await fetch(
     "https://www.thesportsdb.com/api/v2/json/livescore/all",
     {
@@ -153,14 +153,14 @@ const getUpcomingMatch = async (uuid: string) => {
     );
 
     if (!response.ok) {
-      console.warn(`⚠️ SportsDB API returned status ${response.status}`);
-      console.warn("in this  regiion it didnt support the sports db api");
+      // console.warn(`⚠️ SportsDB API returned status ${response.status}`);
+      // console.warn("in this  regiion it didnt support the sports db api");
       return [];
     }
 
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
-      console.warn("⚠️ Unexpected content-type, likely blocked in region.");
+      // console.warn("⚠️ Unexpected content-type, likely blocked in region.");
       return [];
     }
 
