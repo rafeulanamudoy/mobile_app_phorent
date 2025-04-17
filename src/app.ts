@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 
 import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
-import { scheduleLiveScoreFetcher } from "./shared/liveScoreCorn";
+
 import { notificationQueue } from "./shared/notficationQuue";
 import "./shared/notfication.process";
 // ✅ Bull Board Setup
